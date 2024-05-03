@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "veles-bank"
+version = "0.1.0"
+description = ""
+authors = ["Андрей Солдатов <AFeSoldatov@sberbank.ru>"]
+readme = "README.md"
+packages = [{include = "veles"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+sqlalchemy = "^2.0.23"
+alembic = "^1.12.1"
+uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
