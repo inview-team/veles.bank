@@ -3,7 +3,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 
-class AccountReadSchema(BaseModel):
+class WalletReadSchema(BaseModel):
     id: UUID
     balance: float
     type: str
@@ -12,13 +12,13 @@ class AccountReadSchema(BaseModel):
     user_id: UUID
 
 
-class AccountSmallReadSchema(BaseModel):
+class WalletSmallReadSchema(BaseModel):
     id: UUID
     type: str
     number: str
 
 
-class AccountCreateSchema(BaseModel):
+class WalletCreateSchema(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     type: str
     number: str
@@ -26,7 +26,7 @@ class AccountCreateSchema(BaseModel):
     user_id: UUID
 
 
-class AccountUpdateSchema(BaseModel):
+class WalletUpdateSchema(BaseModel):
     id: UUID
     type: str
     balance: float

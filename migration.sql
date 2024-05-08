@@ -6,7 +6,14 @@ CREATE TABLE "user" (
     password VARCHAR(255)
 );
 
-CREATE TABLE "account" (
+CREATE TABLE "company" (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255),
+    balance FLOAT,
+    email VARCHAR(255)
+);
+
+CREATE TABLE "wallet" (
     id UUID PRIMARY KEY,
     balance FLOAT DEFAULT 0.0,
     type VARCHAR(255),
@@ -22,6 +29,16 @@ CREATE TABLE "transaction" (
     sender_id UUID,
     receiver_id UUID,
     amount FLOAT,
-    FOREIGN KEY (sender_id) REFERENCES "account"(id),
-    FOREIGN KEY (receiver_id) REFERENCES "account"(id)
-)
+    FOREIGN KEY (sender_id) REFERENCES "wallet"(id),
+    FOREIGN KEY (receiver_id) REFERENCES "wallet"(id),
+    FOREIGN KEY (sender_id) REFERENCES "company"(id),
+    FOREIGN KEY (receiver_id) REFERENCES "company"(id)
+);
+
+CREATE TABLE "authtoken" (
+    id UUID PRIMARY KEY,
+    token VARCHAR(255),
+    type VARCHAR(255),
+    user_id UUID,
+    FOREIGN KEY (user_id) REFERENCES "user"(id)
+);

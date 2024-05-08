@@ -52,7 +52,10 @@ class UserServiceImpl(UserServiceProtocol):
         user = await self.user_repository.get_user_by_email(params.email)
         if not user:
             raise HTTPException(status_code=400, detail='User not found.')
-        return user
+        if user.password != params.password:
+            raise HTTPException(status_code=400, detail='Wrong password.')
+
+        return UserReadSchema(**user.model_dump(exclude={'password'}))
 
 
 async def get_user_service(user_repository: UserRepository) -> UserServiceProtocol:

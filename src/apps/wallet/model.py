@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.core.db import Base, BASE_ID
 
 
-class Account(Base):
+class Wallet(Base):
     """
     Модель банковского счета.
     """

@@ -1,6 +1,7 @@
+import uuid
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserReadSchema(BaseModel):
@@ -8,6 +9,7 @@ class UserReadSchema(BaseModel):
     first_name: str
     last_name: str
     email: str
+
 
 
 class UserRegistrySchema(BaseModel):
@@ -19,6 +21,7 @@ class UserRegistrySchema(BaseModel):
 
 
 class UserCreateSchema(BaseModel):
+    id: UUID = Field(default_factory=uuid.uuid4)
     first_name: str
     last_name: str
     email: str

@@ -39,7 +39,10 @@ class Settings(BaseSettings):
     """
 
     debug: bool
-
+    secret: str
+    algorithm: str
+    access_exp: int
+    refresh_exp: int
     db: Db
 
     model_config = SettingsConfigDict(
