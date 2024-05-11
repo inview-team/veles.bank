@@ -9,7 +9,8 @@ class WalletReadSchema(BaseModel):
     type: str
     number: str
     status: bool
-    user_id: UUID
+    user_id: UUID | None
+    company_id: UUID | None
 
 
 class WalletSmallReadSchema(BaseModel):
@@ -23,11 +24,16 @@ class WalletCreateSchema(BaseModel):
     type: str
     number: str
     status: bool
-    user_id: UUID
+    user_id: UUID | None
+    company_id: UUID | None
 
 
 class WalletUpdateSchema(BaseModel):
     id: UUID
-    type: str
     balance: float
-    status: bool
+
+
+class WalletSearchSchema(BaseModel):
+    type: str
+    source: str
+    value: str

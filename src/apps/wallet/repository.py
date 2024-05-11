@@ -25,9 +25,15 @@ class WalletRepositoryProtocol(
     async def get_by_user_and_account_id(self, user_id: BASE_ID, wallet_id: BASE_ID) -> WalletReadSchema | None:
         ...
 
+    async def get_by_user_id(self, user_id: BASE_ID) -> WalletReadSchema:
+        ...
+
+    async def get_by_company_id(self, company_id: BASE_ID) -> WalletReadSchema:
+        ...
+
 
 class WalletRepositoryImpl(
-    BaseRepositoryImpl[Wallet, WalletReadSchema, WalletCreateSchema, WalletUpdateSchema],WalletRepositoryProtocol
+    BaseRepositoryImpl[Wallet, WalletReadSchema, WalletCreateSchema, WalletUpdateSchema], WalletRepositoryProtocol
 ):
 
     async def list(self, id: BASE_ID) -> list[WalletReadSchema]:
@@ -41,6 +47,22 @@ class WalletRepositoryImpl(
             statement = sa.select(self.model_type).where(
                 self.model_type.user_id == user_id, self.model_type.id == wallet_id
             )
+            model = (await s.execute(statement)).scalar_one_or_none()
+            if model is None:
+                return None
+            return self.read_schema_type.model_validate(model, from_attributes=True)
+
+    async def get_by_user_id(self, user_id: BASE_ID) -> WalletReadSchema:
+        async with self.session as s:
+            statement = sa.select(self.model_type).where(self.model_type.user_id == user_id)
+            model = (await s.execute(statement)).scalar_one_or_none()
+            if model is None:
+                return None
+            return self.read_schema_type.model_validate(model, from_attributes=True)
+
+    async def get_by_company_id(self, company_id: BASE_ID) -> WalletReadSchema:
+        async with self.session as s:
+            statement = sa.select(self.model_type).where(self.model_type.company_id == company_id)
             model = (await s.execute(statement)).scalar_one_or_none()
             if model is None:
                 return None

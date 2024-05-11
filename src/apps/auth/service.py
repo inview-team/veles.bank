@@ -49,6 +49,9 @@ class AuthServiceImpl(AuthServiceProtocol):
             exp=exp
         )
         token = jwt.encode(claim.model_dump(), key=self.settings.secret, algorithm=self.settings.algorithm)
+        token_dto = AuthCreateSchema(token=token, type=token_type, user_id=user.id)
+        await self.auth_repository.create(token_dto)
+
         return token
 
     async def create(self, user: UserReadSchema) -> AuthSmallReadSchema:
@@ -60,12 +63,6 @@ class AuthServiceImpl(AuthServiceProtocol):
 
         access = await self.create_token(user, self.settings.access_exp, "access")
         refresh = await self.create_token(user, self.settings.refresh_exp, "refresh")
-
-        token_dto = AuthCreateSchema(token=access, type="access", user_id=user.id)
-        await self.auth_repository.create(token_dto)
-
-        token_dto = AuthCreateSchema(token=refresh, type="refresh", user_id=user.id)
-        await self.auth_repository.create(token_dto)
 
         return AuthSmallReadSchema(access=access, refresh=refresh)
 

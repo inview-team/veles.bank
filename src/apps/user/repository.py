@@ -16,6 +16,9 @@ class UserRepositoryProtocol(BaseRepositoryProtocol[User, UserReadSchema, UserCr
     async def get_user_by_email(self, email: str) -> UserCreateSchema | None:
         ...
 
+    async def get_user_by_phone_number(self, phone_number: str) -> UserReadSchema | None:
+        ...
+
 
 class UserRepositoryImpl(
     BaseRepositoryImpl[User, UserReadSchema, UserCreateSchema, UserUpdateSchema], UserRepositoryProtocol
@@ -31,6 +34,14 @@ class UserRepositoryImpl(
             if model is None:
                 return None
             return self.create_schema_type.model_validate(model, from_attributes=True)
+
+    async def get_user_by_phone_number(self, phone_number: str) -> UserReadSchema | None:
+        async with self.session as s:
+            statement = sa.select(self.model_type).where(self.model_type.phone_number == phone_number)
+            model = (await s.execute(statement)).scalar_one_or_none()
+            if model is None:
+                return None
+            return self.read_schema_type.model_validate(model, from_attributes=True)
 
 
 async def get_user_repository(session: Session) -> UserRepositoryProtocol:

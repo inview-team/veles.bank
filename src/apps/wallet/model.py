@@ -17,4 +17,5 @@ class Wallet(Base):
     type: Mapped[str]
     number: Mapped[str]
     status: Mapped[bool]
-    user_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
+    user_id: Mapped[UUID]
+    company_id: Mapped[UUID]

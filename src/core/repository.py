@@ -48,8 +48,8 @@ class BaseRepositoryImpl(Generic[ModelType, ReadSchemaType, CreateSchemaType, Up
         async with self.session as s:
             statement = sa.select(self.model_type).where(self.model_type.id == id)
             model = (await s.execute(statement)).scalar_one_or_none()
-            # if model is None:
-            #     raise ModelNotFoundException(self.model_type, str(id))
+            if model is None:
+                return None
             return self.read_schema_type.model_validate(model, from_attributes=True)
 
     async def get_by_ids(self: Self, ids: list[BASE_ID | str]) -> list[ReadSchemaType]:

@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -32,7 +33,7 @@ CurrentUser = Annotated[UserReadSchema, Depends(get_current_user)]
 async def get_current_user_from_refresh(
     user_repository: UserRepository,
     auth_repository: AuthRepository,
-    params: RefreshRequestSchema = Depends(),
+    params: RefreshRequestSchema,
 ) -> UserReadSchema:
     token = await auth_repository.get_by_token(value=params.refresh, type="refresh")
     if not token:

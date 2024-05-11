@@ -3,6 +3,7 @@ from typing import Protocol, Annotated
 import sqlalchemy
 from fastapi import Depends, HTTPException
 
+from src.apps.company.utils import rebuild_phone_number
 from src.apps.user.repository import UserRepositoryProtocol, UserRepository
 from src.apps.user.schema import UserCreateSchema, UserReadSchema, LoginSchema, UserRegistrySchema
 from src.core.repository import BaseRepositoryProtocol
@@ -42,7 +43,9 @@ class UserServiceImpl(UserServiceProtocol):
         if params.password != params.password2:
             raise HTTPException(status_code=400, detail="Passwords don't match.")
         user_dto = UserCreateSchema(
-            password=get_password_hash(params.password), **params.model_dump(exclude={'password2', 'password'})
+            password=get_password_hash(params.password),
+            phone_number=(await rebuild_phone_number(params.phone_number)),
+            **params.model_dump(exclude={'password2', 'password', 'phone_number'})
         )
         try:
             user = await self.user_repository.create(user_dto)
