@@ -1,10 +1,12 @@
 from typing import Protocol, Annotated
 
+import sqlalchemy
 from fastapi import Depends, HTTPException
 
 from src.apps.user.repository import UserRepositoryProtocol, UserRepository
 from src.apps.user.schema import UserCreateSchema, UserReadSchema, LoginSchema, UserRegistrySchema
 from src.core.repository import BaseRepositoryProtocol
+from src.apps.user.utils.string import get_password_hash, verify_password
 
 
 class UserServiceProtocol(Protocol):
@@ -39,8 +41,14 @@ class UserServiceImpl(UserServiceProtocol):
             raise HTTPException(status_code=400, detail='User already exists.')
         if params.password != params.password2:
             raise HTTPException(status_code=400, detail="Passwords don't match.")
-        user_dto = UserCreateSchema(**params.model_dump(exclude={'password2'}))
-        return await self.user_repository.create(user_dto)
+        user_dto = UserCreateSchema(
+            password=get_password_hash(params.password), **params.model_dump(exclude={'password2', 'password'})
+        )
+        try:
+            user = await self.user_repository.create(user_dto)
+        except sqlalchemy.exc.IntegrityError as exc:
+            raise HTTPException(status_code=400, detail="User with these phone_number already exist.") from exc
+        return user
 
     async def login(self, params: LoginSchema) -> UserReadSchema:
         """
@@ -52,7 +60,7 @@ class UserServiceImpl(UserServiceProtocol):
         user = await self.user_repository.get_user_by_email(params.email)
         if not user:
             raise HTTPException(status_code=400, detail='User not found.')
-        if user.password != params.password:
+        if not verify_password(params.password, user.password):
             raise HTTPException(status_code=400, detail='Wrong password.')
 
         return UserReadSchema(**user.model_dump(exclude={'password'}))

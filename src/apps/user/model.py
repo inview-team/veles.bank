@@ -14,4 +14,5 @@ class User(Base):
     first_name: Mapped[str]
     last_name: Mapped[str]
     email: Mapped[str]
+    phone_number: Mapped[str]
     password: Mapped[str]
