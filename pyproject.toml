@@ -16,6 +16,7 @@ uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
 greenlet = "^3.0.3"
 pydantic-settings = "^2.0.3"
 python-jose = "^3.3.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

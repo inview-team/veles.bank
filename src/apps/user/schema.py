@@ -9,13 +9,14 @@ class UserReadSchema(BaseModel):
     first_name: str
     last_name: str
     email: str
-
+    phone_number: str
 
 
 class UserRegistrySchema(BaseModel):
     first_name: str
     last_name: str
     email: str
+    phone_number: str
     password: str
     password2: str
 
@@ -25,6 +26,7 @@ class UserCreateSchema(BaseModel):
     first_name: str
     last_name: str
     email: str
+    phone_number: str
     password: str
 
 

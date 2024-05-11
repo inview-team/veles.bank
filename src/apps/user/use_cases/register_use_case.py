@@ -34,11 +34,15 @@ class UserRegistryUseCaseImpl:
         user = await self.user_service.registry_user(params=params)
         token_dto = await self.auth_service.create(user)
         return await self.make_response(
-            status=201, content={"id": str(user.id), **user.model_dump(exclude={"id"}), "token": token_dto.access},
+            status=201, content={"id": str(user.id), **user.model_dump(exclude={"id"}), "access_token": token_dto.access},
         )
 
     async def make_response(self, status, content) -> Response:
-        return JSONResponse(content={"result": content}, status_code=status)
+        refresh_token = content.pop("refresh")
+        response = JSONResponse(content=content, status_code=status)
+        response.set_cookie(key="refresh", value=refresh_token, httponly=True)
+
+        return response
 
 
 async def get_user_registry_use_case(user_service: UserService, auth_service: AuthService) -> UserRegistryUseCaseImpl:

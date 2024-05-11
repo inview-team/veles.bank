@@ -3,6 +3,7 @@ CREATE TABLE "user" (
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR(255) UNIQUE,
+    phone_number VARCHAR(255) UNIQUE,
     password VARCHAR(255)
 );
 
@@ -28,11 +29,8 @@ CREATE TABLE "transaction" (
     id UUID PRIMARY KEY,
     sender_id UUID,
     receiver_id UUID,
-    amount FLOAT,
-    FOREIGN KEY (sender_id) REFERENCES "wallet"(id),
-    FOREIGN KEY (receiver_id) REFERENCES "wallet"(id),
-    FOREIGN KEY (sender_id) REFERENCES "company"(id),
-    FOREIGN KEY (receiver_id) REFERENCES "company"(id)
+    type VARCHAR(255),
+    amount FLOAT
 );
 
 CREATE TABLE "authtoken" (

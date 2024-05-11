@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Body
 
 from src.apps.auth.depends import CurrentUser
 from src.apps.user.schema import UserCreateSchema, UserRegistrySchema, LoginSchema
@@ -9,7 +11,18 @@ user_router = APIRouter(prefix='')
 
 
 @user_router.post('/register')
-async def user_register(params: UserRegistrySchema, user_registry_use_case: UserRegistryUseCase):
+async def user_register(
+        params: Annotated[UserRegistrySchema,
+        Body(example={
+            "first_name": "Mike",
+            "last_name": "Bobov",
+            "email": "mtstruetech@example.com",
+            "phone_number": "89234567890",
+            "password": "12345678",
+            "password2": "12345678"},)
+        ],
+        user_registry_use_case: UserRegistryUseCase
+):
     """
     Регистрация пользователя.
     :param params:
@@ -21,10 +34,13 @@ async def user_register(params: UserRegistrySchema, user_registry_use_case: User
 
 
 @user_router.post('/login')
-async def login(params: LoginSchema, user_login_use_case: UserLoginUseCase):
+async def login(
+        params: Annotated[LoginSchema,
+        Body(example={"email": "mtstruetech@example.com", "password": "12345678"})],
+        user_login_use_case: UserLoginUseCase,
+):
     """
     Авторизация пользователя.
-    :param current_user:
     :param params: LoginSchema
     :param user_login_use_case: UserLoginUseCase
     :return: UserReadSchema
