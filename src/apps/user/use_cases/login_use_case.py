@@ -14,6 +14,9 @@ class UserLoginUseCaseProtocol(Protocol):
     async def login(self) -> str:
         ...
 
+    async def make_response(self):
+        ...
+
 
 class UserLoginUseCaseImpl:
     """
@@ -27,7 +30,18 @@ class UserLoginUseCaseImpl:
     async def __call__(self, params: LoginSchema):
         user = await self.user_service.login(params)
         token_dto = await self.auth_service.create(user)
-        return LoginResponseSchema(**user.model_dump(exclude={'password'}), **token_dto.model_dump())
+        return await self.make_response(
+            status=200,
+            content={"id": str(user.id), **user.model_dump(exclude={"id"}), "access": token_dto.access,
+                     "refresh": token_dto.refresh},
+        )
+
+    async def make_response(self, status, content) -> Response:
+        refresh_token = content.pop("refresh")
+        response = JSONResponse(content=content, status_code=status)
+        response.set_cookie(key="refresh", value=refresh_token, httponly=True)
+
+        return response
 
 
 async def get_user_login_use_case(user_service: UserService, auth_service: AuthService) -> UserLoginUseCaseImpl:

@@ -10,6 +10,6 @@ class Transaction(Base):
     id: Mapped[BASE_ID] = mapped_column(primary_key=True, default=uuid4)
     amount: Mapped[float]
     sender_id: Mapped[BASE_ID]
-    recipient_id: Mapped[BASE_ID]
+    receiver_id: Mapped[BASE_ID]
     type: Mapped[str]
 

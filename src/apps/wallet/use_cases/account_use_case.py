@@ -25,27 +25,24 @@ class WalletGetUseCaseImpl:
 
     def __init__(
         self,
-        user_id: UUID,
         wallet_id: UUID,
         wallet_service: WalletServiceProtocol,
         user: UserReadSchema,
     ):
-        self.user_id = user_id
         self.wallet_id = wallet_id
         self.wallet_service = wallet_service
         self.user = user
 
     async def __call__(self) -> WalletReadSchema:
-        return await self.wallet_service.get_by_user_and_account_id(self.user_id, self.wallet_id)
+        return await self.wallet_service.get_by_user_and_wallet_id(self.user.id, self.wallet_id)
 
 
 async def get_account_use_case(
-    user_id: UUID,
-    account_id: UUID,
-    account_service: WalletService,
+    wallet_id: UUID,
+    wallet_service: WalletService,
     current_user: CurrentUser,
 ) -> WalletGetUseCaseImpl:
-    return WalletGetUseCaseImpl(user_id, account_id, account_service, current_user)
+    return WalletGetUseCaseImpl(wallet_id, wallet_service, current_user)
 
 
 WalletGetUseCase = Annotated[WalletGetUseCaseProtocol, Depends(get_account_use_case)]

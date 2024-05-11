@@ -15,6 +15,9 @@ class CompanyRepositoryProtocol(
     async def get_all_companies(self) -> list[CompanyReadSchema]:
         ...
 
+    async def get_by_name(self, name: str) -> CompanyReadSchema | None:
+        ...
+
 
 class CompanyRepositoryImpl(
     BaseRepositoryImpl[Company, CompanyReadSchema, CompanyCreateSchema, CompanyUpdateSchema], CompanyRepositoryProtocol
@@ -24,6 +27,14 @@ class CompanyRepositoryImpl(
             statement = sa.select(self.model_type)
             model = (await s.execute(statement)).scalars().all()
             return [self.read_schema_type.model_validate(m, from_attributes=True) for m in model]
+
+    async def get_by_name(self, name: str) -> CompanyReadSchema | None:
+        async with self.session as s:
+            statement = sa.select(self.model_type).where(self.model_type.name == name)
+            model = (await s.execute(statement)).scalar_one_or_none()
+            if model is None:
+                return None
+            return self.read_schema_type.model_validate(model, from_attributes=True)
 
 
 async def get_company_repository(session: Session) -> CompanyRepositoryProtocol:

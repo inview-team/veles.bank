@@ -14,8 +14,9 @@ class CompanyReadSchema(CompanyBaseSchema):
 
 
 class CompanyCreateSchema(CompanyBaseSchema):
-    balance: float = Field(default=0.0)
+    ...
 
 
 class CompanyUpdateSchema(BaseModel):
-    balance: float
+    ...
+
