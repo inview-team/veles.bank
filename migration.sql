@@ -10,7 +10,6 @@ CREATE TABLE "user" (
 CREATE TABLE "company" (
     id UUID PRIMARY KEY,
     name VARCHAR(255),
-    balance FLOAT,
     email VARCHAR(255)
 );
 
@@ -21,7 +20,7 @@ CREATE TABLE "wallet" (
     number VARCHAR(255),
     status BOOLEAN,
     user_id UUID,
-    FOREIGN KEY (user_id) REFERENCES "user"(id)
+    company_id UUID
 );
 
 
