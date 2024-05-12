@@ -17,7 +17,7 @@ class WalletServiceProtocol(Protocol):
     Account service protocol
     """
 
-    async def get_all_wallets(self, user_id: UUID) -> list[WalletReadSchema]:
+    async def get_all_wallets(self, user_id: UUID) -> WalletReadSchema:
         ...
 
     async def get_by_user_and_wallet_id(self, user_id: UUID, account_id: UUID) -> WalletReadSchema:
@@ -45,15 +45,14 @@ class WalletServiceImpl(WalletServiceProtocol):
         self.user_repository = user_repository
         self.company_repository = company_repository
 
-
-    async def get_all_wallets(self, user_id: UUID) -> list[WalletReadSchema]:
+    async def get_all_wallets(self, user_id: UUID) -> WalletReadSchema:
         """
         Get all accounts
         :param user_id:
         :return:
         """
 
-        return await self.wallet_repository.list(user_id)
+        return await self.wallet_repository.first(user_id)
 
     async def get_by_user_and_wallet_id(self, user_id: UUID, wallet_id: UUID) -> WalletReadSchema | None:
         """
