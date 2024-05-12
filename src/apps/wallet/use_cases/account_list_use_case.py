@@ -31,14 +31,14 @@ class WalletListUseCaseImpl:
         self.wallet_service = wallet_service
         self.user = current_user
 
-    async def __call__(self) -> list[WalletReadSchema]:
+    async def __call__(self) -> WalletReadSchema:
         return await self.wallet_service.get_all_wallets(user_id=self.user.id)
 
 
 async def get_wallet_list_use_case(
     account_service: WalletService,
     current_user: CurrentUser,
-) -> WalletListUseCaseProtocol:
+) -> WalletListUseCaseImpl:
     return WalletListUseCaseImpl(account_service, current_user)
 
 

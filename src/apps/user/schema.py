@@ -37,3 +37,6 @@ class UserUpdateSchema(BaseModel):
 class LoginSchema(BaseModel):
     email: str
     password: str
+
+class UserResponseSchema(UserReadSchema):
+    access: str

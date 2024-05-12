@@ -19,7 +19,7 @@ class WalletRepositoryProtocol(
 
     ...
 
-    async def list(self, id: BASE_ID) -> list[WalletReadSchema]:
+    async def first(self, id: BASE_ID) -> WalletReadSchema:
         ...
 
     async def get_by_user_and_account_id(self, user_id: BASE_ID, wallet_id: BASE_ID) -> WalletReadSchema | None:
@@ -36,11 +36,11 @@ class WalletRepositoryImpl(
     BaseRepositoryImpl[Wallet, WalletReadSchema, WalletCreateSchema, WalletUpdateSchema], WalletRepositoryProtocol
 ):
 
-    async def list(self, id: BASE_ID) -> list[WalletReadSchema]:
+    async def first(self, id: BASE_ID) -> WalletReadSchema:
         async with self.session as s:
             statement = sa.select(self.model_type).where(self.model_type.user_id == id)
-            models = (await s.execute(statement)).scalars().all()
-            return [self.read_schema_type.model_validate(model, from_attributes=True) for model in models]
+            model = (await s.execute(statement)).scalars().first()
+            return self.read_schema_type.model_validate(model, from_attributes=True)
 
     async def get_by_user_and_account_id(self, user_id: BASE_ID, wallet_id: BASE_ID) -> WalletReadSchema | None:
         async with self.session as s:
