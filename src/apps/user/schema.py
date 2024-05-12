@@ -38,5 +38,13 @@ class LoginSchema(BaseModel):
     email: str
     password: str
 
+
 class UserResponseSchema(UserReadSchema):
     access: str
+
+
+class UserMeSchema(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    phone_number: str

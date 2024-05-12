@@ -37,3 +37,17 @@ class WalletSearchSchema(BaseModel):
     type: str
     source: str
     value: str
+
+
+class WalletMeSchema(BaseModel):
+    id: UUID
+    balance: float
+    number: str
+    holder_id: UUID
+
+
+class WalletResponseSchema(BaseModel):
+    id: UUID
+    number: str
+    status: bool
+    holder_id: UUID

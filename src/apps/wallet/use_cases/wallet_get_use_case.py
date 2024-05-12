@@ -9,20 +9,12 @@ from src.apps.auth.depends import CurrentUser
 from src.apps.user.schema import UserReadSchema
 
 
-class WalletListUseCaseProtocol(Protocol):
-    """
-    Базовый интерфейс юз-кейса получения списка аккаунтов
-    """
-
+class WalletGetUseCaseProtocol(Protocol):
     async def __call__(self) -> list[WalletReadSchema]:
         ...
 
 
-class WalletListUseCaseImpl:
-    """
-    Реализация юз-кейса получения списка аккаунтов
-    """
-
+class WalletGetUseCaseImpl:
     def __init__(
         self,
         wallet_service: WalletServiceProtocol,
@@ -38,8 +30,8 @@ class WalletListUseCaseImpl:
 async def get_wallet_list_use_case(
     account_service: WalletService,
     current_user: CurrentUser,
-) -> WalletListUseCaseImpl:
-    return WalletListUseCaseImpl(account_service, current_user)
+) -> WalletGetUseCaseImpl:
+    return WalletGetUseCaseImpl(account_service, current_user)
 
 
-WalletListUseCase = Annotated[WalletListUseCaseProtocol, Depends(get_wallet_list_use_case)]
+WalletGetUseCase = Annotated[WalletGetUseCaseProtocol, Depends(get_wallet_list_use_case)]

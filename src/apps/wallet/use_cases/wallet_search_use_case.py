@@ -2,7 +2,7 @@ from typing import Protocol, Annotated
 
 from fastapi import Depends, Body
 
-from src.apps.wallet.schema import WalletReadSchema, WalletSearchSchema
+from src.apps.wallet.schema import WalletReadSchema, WalletSearchSchema, WalletResponseSchema
 from src.apps.wallet.service import WalletServiceProtocol, WalletService
 
 
@@ -16,7 +16,7 @@ class WalletSearchUseCaseImpl:
     def __init__(self, wallet_service: WalletServiceProtocol):
         self.wallet_service = wallet_service
 
-    async def __call__(self, params: WalletSearchSchema) -> WalletReadSchema:
+    async def __call__(self, params: WalletSearchSchema) -> WalletResponseSchema:
         return await self.wallet_service.get_wallet_by_value(params)
 
 

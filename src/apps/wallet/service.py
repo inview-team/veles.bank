@@ -9,7 +9,8 @@ from src.apps.company.utils import rebuild_phone_number
 from src.apps.user.repository import UserRepositoryProtocol, UserRepository
 from src.apps.user.schema import UserReadSchema
 from src.apps.wallet.repository import WalletRepositoryProtocol, WalletRepository
-from src.apps.wallet.schema import WalletReadSchema, WalletCreateSchema, WalletSearchSchema
+from src.apps.wallet.schema import WalletReadSchema, WalletCreateSchema, WalletSearchSchema, WalletResponseSchema, \
+    WalletMeSchema
 
 
 class WalletServiceProtocol(Protocol):
@@ -17,16 +18,19 @@ class WalletServiceProtocol(Protocol):
     Account service protocol
     """
 
+    async def get_by_holder_id(self, holder_id: UUID) -> WalletReadSchema:
+        ...
+
     async def get_all_wallets(self, user_id: UUID) -> WalletReadSchema:
         ...
 
-    async def get_by_user_and_wallet_id(self, user_id: UUID, account_id: UUID) -> WalletReadSchema:
+    async def get_by_user_and_wallet_id(self, user_id: UUID, wallet_id: UUID) -> WalletMeSchema:
         ...
 
     async def create(self, user: UserReadSchema) -> WalletReadSchema:
         ...
 
-    async def get_wallet_by_value(self, params: WalletSearchSchema) -> WalletReadSchema | None:
+    async def get_wallet_by_value(self, params: WalletSearchSchema) -> WalletResponseSchema | None:
         ...
 
 
@@ -54,7 +58,7 @@ class WalletServiceImpl(WalletServiceProtocol):
 
         return await self.wallet_repository.first(user_id)
 
-    async def get_by_user_and_wallet_id(self, user_id: UUID, wallet_id: UUID) -> WalletReadSchema | None:
+    async def get_by_user_and_wallet_id(self, user_id: UUID, wallet_id: UUID) -> WalletMeSchema:
         """
         Get wallet by user id and wallet id
         :param wallet_id:
@@ -62,7 +66,11 @@ class WalletServiceImpl(WalletServiceProtocol):
         :return: AccountReadSchema | None
         """
 
-        return await self.wallet_repository.get_by_user_and_account_id(user_id, wallet_id)
+        wallet = await self.wallet_repository.get_by_user_and_account_id(user_id, wallet_id)
+        if not wallet:
+            raise HTTPException(status_code=404, detail="Wallet not found")
+        holder_id = wallet.user_id if wallet.user_id else wallet.company_id
+        return WalletMeSchema(holder_id=holder_id, **wallet.model_dump(exclude={"company_id", "user_id"}))
 
     async def create(self, user: UserReadSchema) -> WalletReadSchema:
         wallet_dto = WalletCreateSchema(
@@ -73,19 +81,28 @@ class WalletServiceImpl(WalletServiceProtocol):
         )
         return await self.wallet_repository.create(wallet_dto)
 
-    async def get_wallet_by_value(self, params: WalletSearchSchema) -> WalletReadSchema | None:
+    async def get_wallet_by_value(self, params: WalletSearchSchema) -> WalletResponseSchema | None:
         if params.type == "phone":
             phone_number = await rebuild_phone_number(params.value)
             user = (await self.user_repository.get_user_by_phone_number(phone_number))
             if not user:
                 raise HTTPException(status_code=404, detail="User with these phone_number not found")
-            return await self.wallet_repository.get_by_user_id(user.id)
+            wallet = await self.wallet_repository.get_by_user_id(user.id)
+            if not wallet:
+                raise HTTPException(status_code=404, detail="Wallet with these user not found")
+            return WalletResponseSchema(holder_id=wallet.id, **wallet.model_dump(exclude={"company_id", "user_id"}))
         elif params.type == "company":
             company = (await self.company_repository.get_by_name(params.value))
             if not company:
                 raise HTTPException(status_code=404, detail="Company with these name not found")
-            return await self.wallet_repository.get_by_company_id(company.id)
+            wallet = await self.wallet_repository.get_by_company_id(company.id)
+            if not wallet:
+                raise HTTPException(status_code=404, detail="Wallet with these company not found")
+            return WalletResponseSchema(holder_id=wallet.id, **wallet.model_dump(exclude={"company_id", "user_id"}))
         return None
+
+    async def get_by_holder_id(self, holder_id: UUID) -> WalletReadSchema:
+        return await self.wallet_repository.first(holder_id)
 
 
 async def get_account_service(

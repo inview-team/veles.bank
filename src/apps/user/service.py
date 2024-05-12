@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException
 
 from src.apps.company.utils import rebuild_phone_number
 from src.apps.user.repository import UserRepositoryProtocol, UserRepository
-from src.apps.user.schema import UserCreateSchema, UserReadSchema, LoginSchema, UserRegistrySchema
+from src.apps.user.schema import UserCreateSchema, UserReadSchema, LoginSchema, UserRegistrySchema, UserMeSchema
 from src.core.repository import BaseRepositoryProtocol
 from src.apps.user.utils.string import get_password_hash, verify_password
 
@@ -19,6 +19,9 @@ class UserServiceProtocol(Protocol):
         ...
 
     async def login(self, params: LoginSchema) -> UserReadSchema:
+        ...
+
+    async def me(self, user: UserReadSchema) -> UserMeSchema:
         ...
 
 
@@ -67,6 +70,9 @@ class UserServiceImpl(UserServiceProtocol):
             raise HTTPException(status_code=400, detail='Wrong password.')
 
         return UserReadSchema(**user.model_dump(exclude={'password'}))
+
+    async def me(self, user: UserReadSchema) -> UserMeSchema:
+        return UserMeSchema(**user.model_dump())
 
 
 async def get_user_service(user_repository: UserRepository) -> UserServiceProtocol:

@@ -3,8 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Body
 
 from src.apps.auth.depends import CurrentUser
-from src.apps.user.schema import UserCreateSchema, UserRegistrySchema, LoginSchema, UserResponseSchema
+from src.apps.user.schema import UserCreateSchema, UserRegistrySchema, LoginSchema, UserResponseSchema, UserMeSchema
 from src.apps.user.use_cases.login_use_case import UserLoginUseCase
+from src.apps.user.use_cases.me_use_case import UserMeUseCase
 from src.apps.user.use_cases.register_use_case import UserRegistryUseCase
 
 user_router = APIRouter(prefix='')
@@ -19,7 +20,7 @@ async def user_register(
             "email": "mtstruetech@example.com",
             "phone_number": "89234567890",
             "password": "12345678",
-            "password2": "12345678"},)
+            "password2": "12345678"}, )
         ],
         user_registry_use_case: UserRegistryUseCase
 ):
@@ -47,3 +48,8 @@ async def login(
     """
 
     return await user_login_use_case(params)
+
+
+@user_router.get('/me', response_model=UserMeSchema)
+async def me(user_me: UserMeUseCase):
+    return await user_me()
