@@ -41,7 +41,7 @@ class AuthServiceImpl(AuthServiceProtocol):
 
         token = await self.auth_repository.get_by_user_id(user.id, token_type)
         if token:
-            return token.token
+            await self.auth_repository.delete_by_type_user_id(user_id=user.id, token_type=token_type)
         exp = datetime.utcnow() + timedelta(minutes=token_ttl)
         claim = AuthGenerateSchema(
             sub=str(user.id),
@@ -50,7 +50,8 @@ class AuthServiceImpl(AuthServiceProtocol):
         )
         token = jwt.encode(claim.model_dump(), key=self.settings.secret, algorithm=self.settings.algorithm)
         token_dto = AuthCreateSchema(token=token, type=token_type, user_id=user.id)
-        await self.auth_repository.create(token_dto)
+        if token_type == "refresh":
+            await self.auth_repository.create(token_dto)
 
         return token
 

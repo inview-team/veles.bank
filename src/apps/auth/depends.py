@@ -15,14 +15,10 @@ from src.settings import settings
 async def get_current_user(
         credentials: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())],
         user_repository: UserRepository,
-        auth_repository: AuthRepository,
 ) -> UserReadSchema:
-    token = await auth_repository.get_by_token(value=credentials.credentials, type="access")
-    if not token:
-        raise HTTPException(status_code=401, detail="Invalid token")
     try:
         token = jwt.decode(credentials.credentials, key=settings.secret, algorithms=[settings.algorithm])
-    except JWTError:
+    except JWTError as exc:
         raise HTTPException(status_code=401, detail="Invalid token")
     return await user_repository.get(token['sub'])
 
