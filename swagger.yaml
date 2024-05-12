@@ -37,13 +37,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WalletReadSchema"
+                $ref: "#/components/schemas/WalletResponseSchema"
         "422":
           description: "Validation Error"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
+      security:
+      - HTTPBearer: []
   /api/v1/register:
     post:
       summary: "User Register"
@@ -104,6 +106,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
+  /api/v1/me:
+    get:
+      summary: "Me"
+      operationId: "me_api_v1_me_get"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserMeSchema"
+      security:
+      - HTTPBearer: []
   /api/v1/refresh:
     post:
       summary: "Refresh"
@@ -256,6 +271,27 @@ components:
       - "to_wallet_id"
       - "amount"
       title: "TransferRequestSchema"
+    UserMeSchema:
+      properties:
+        first_name:
+          type: "string"
+          title: "First Name"
+        last_name:
+          type: "string"
+          title: "Last Name"
+        email:
+          type: "string"
+          title: "Email"
+        phone_number:
+          type: "string"
+          title: "Phone Number"
+      type: "object"
+      required:
+      - "first_name"
+      - "last_name"
+      - "email"
+      - "phone_number"
+      title: "UserMeSchema"
     UserRegistrySchema:
       properties:
         first_name:
@@ -354,18 +390,10 @@ components:
         status:
           type: "boolean"
           title: "Status"
-        user_id:
-          anyOf:
-          - type: "string"
-            format: "uuid"
-          - type: "null"
-          title: "User Id"
-        company_id:
-          anyOf:
-          - type: "string"
-            format: "uuid"
-          - type: "null"
-          title: "Company Id"
+        holder_id:
+          type: "string"
+          format: "uuid"
+          title: "Holder Id"
       type: "object"
       required:
       - "id"
@@ -373,9 +401,31 @@ components:
       - "type"
       - "number"
       - "status"
-      - "user_id"
-      - "company_id"
+      - "holder_id"
       title: "WalletReadSchema"
+    WalletResponseSchema:
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          title: "Id"
+        number:
+          type: "string"
+          title: "Number"
+        status:
+          type: "boolean"
+          title: "Status"
+        holder_id:
+          type: "string"
+          format: "uuid"
+          title: "Holder Id"
+      type: "object"
+      required:
+      - "id"
+      - "number"
+      - "status"
+      - "holder_id"
+      title: "WalletResponseSchema"
     WalletSearchSchema:
       properties:
         type:
