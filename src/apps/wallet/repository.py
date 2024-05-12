@@ -28,7 +28,7 @@ class WalletRepositoryProtocol(
     async def get_by_user_id(self, user_id: BASE_ID) -> WalletReadSchema:
         ...
 
-    async def get_by_company_id(self, company_id: BASE_ID) -> WalletReadSchema:
+    async def get_by_holder_id(self, holder_id: BASE_ID) -> WalletReadSchema:
         ...
 
 
@@ -60,9 +60,9 @@ class WalletRepositoryImpl(
                 return None
             return self.read_schema_type.model_validate(model, from_attributes=True)
 
-    async def get_by_company_id(self, company_id: BASE_ID) -> WalletReadSchema:
+    async def get_by_holder_id(self, holder_id: BASE_ID) -> WalletReadSchema:
         async with self.session as s:
-            statement = sa.select(self.model_type).where(self.model_type.company_id == company_id)
+            statement = sa.select(self.model_type).where(self.model_type.holder_id == holder_id)
             model = (await s.execute(statement)).scalar_one_or_none()
             if model is None:
                 return None

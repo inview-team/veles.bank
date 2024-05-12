@@ -14,6 +14,7 @@ class TransactionReadSchema(BaseModel):
 class TransactionCreateSchema(BaseModel):
     sender_id: UUID
     receiver_id: UUID
+    type: str = Field(default="success")
     amount: float
 
 

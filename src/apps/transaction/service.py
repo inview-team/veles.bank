@@ -26,7 +26,7 @@ class TransactionServiceImpl(TransactionServiceProtocol):
         return await self.transaction_repository.create(transaction_create_schema)
 
     async def transfer(self, params: TransferRequestSchema, user_id: UUID) -> TransactionReadSchema:
-        from_wallet = await self.wallet_repository.get_by_user_id(user_id)
+        from_wallet = await self.wallet_repository.get_by_holder_id(user_id)
         to_wallet = await self.wallet_repository.get(params.to_wallet_id)
         if not to_wallet or not from_wallet:
             raise HTTPException(status_code=404, detail="Wallet not found")

@@ -67,7 +67,7 @@ class UserServiceImpl(UserServiceProtocol):
         if not user:
             raise HTTPException(status_code=400, detail='User not found.')
         if not verify_password(params.password, user.password):
-            raise HTTPException(status_code=400, detail='Wrong password.')
+            raise HTTPException(status_code=400, detail='Incorrect login or password')
 
         return UserReadSchema(**user.model_dump(exclude={'password'}))
 

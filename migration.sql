@@ -19,8 +19,7 @@ CREATE TABLE "wallet" (
     type VARCHAR(255),
     number VARCHAR(255),
     status BOOLEAN,
-    user_id UUID,
-    company_id UUID
+    holder_id UUID
 );
 
 

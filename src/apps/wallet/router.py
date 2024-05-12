@@ -18,5 +18,8 @@ async def get_list_of_wallets(wallet_use_case: WalletGetUseCase):
 
 
 @wallet_router.get('/search', response_model=WalletResponseSchema, dependencies=[Depends(get_current_user)])
-async def search(params: Annotated[WalletSearchSchema, Body(example={"type":"phone", "source":"wallet", "value":"+79234567892"})], wallet_use_case: WalletSearchUseCase):
+async def search(
+    params: Annotated[WalletSearchSchema, Body(example={"type": "phone", "source": "wallet", "value": "+79234567892"})],
+    wallet_use_case: WalletSearchUseCase
+):
     return await wallet_use_case(params)

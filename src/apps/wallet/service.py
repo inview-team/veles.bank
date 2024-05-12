@@ -76,8 +76,7 @@ class WalletServiceImpl(WalletServiceProtocol):
         wallet_dto = WalletCreateSchema(
             balance=0.0, type="debet",
             number=str(secrets.randbelow(10 ** 16)),
-            status=True, user_id=user.id,
-            company_id=None,
+            status=True, holder_id=user.id
         )
         return await self.wallet_repository.create(wallet_dto)
 
@@ -86,19 +85,19 @@ class WalletServiceImpl(WalletServiceProtocol):
             phone_number = await rebuild_phone_number(params.value)
             user = (await self.user_repository.get_user_by_phone_number(phone_number))
             if not user:
-                raise HTTPException(status_code=404, detail="User with these phone_number not found")
-            wallet = await self.wallet_repository.get_by_user_id(user.id)
+                raise HTTPException(status_code=404, detail="This user doesn't exist")
+            wallet = await self.wallet_repository.get_by_holder_id(user.id)
             if not wallet:
-                raise HTTPException(status_code=404, detail="Wallet with these user not found")
-            return WalletResponseSchema(holder_id=wallet.id, **wallet.model_dump(exclude={"company_id", "user_id"}))
+                raise HTTPException(status_code=404, detail="This user's wallet wasn't found")
+            return WalletResponseSchema(**wallet.model_dump())
         elif params.type == "company":
             company = (await self.company_repository.get_by_name(params.value))
             if not company:
-                raise HTTPException(status_code=404, detail="Company with these name not found")
-            wallet = await self.wallet_repository.get_by_company_id(company.id)
+                raise HTTPException(status_code=404, detail="This company doesn't exist")
+            wallet = await self.wallet_repository.get_by_holder_id(company.id)
             if not wallet:
-                raise HTTPException(status_code=404, detail="Wallet with these company not found")
-            return WalletResponseSchema(holder_id=wallet.id, **wallet.model_dump(exclude={"company_id", "user_id"}))
+                raise HTTPException(status_code=404, detail="This company's wallet wasn't found")
+            return WalletResponseSchema(**wallet.model_dump())
         return None
 
     async def get_by_holder_id(self, holder_id: UUID) -> WalletReadSchema:
