@@ -40,10 +40,10 @@ class WalletServiceImpl(WalletServiceProtocol):
     """
 
     def __init__(
-        self,
-        wallet_repository: WalletRepositoryProtocol,
-        user_repository: UserRepositoryProtocol,
-        company_repository: CompanyRepositoryProtocol
+            self,
+            wallet_repository: WalletRepositoryProtocol,
+            user_repository: UserRepositoryProtocol,
+            company_repository: CompanyRepositoryProtocol
     ):
         self.wallet_repository = wallet_repository
         self.user_repository = user_repository
@@ -105,9 +105,9 @@ class WalletServiceImpl(WalletServiceProtocol):
 
 
 async def get_account_service(
-    wallet_repository: WalletRepository,
-    user_repository: UserRepository,
-    company_repository: CompanyRepository,
+        wallet_repository: WalletRepository,
+        user_repository: UserRepository,
+        company_repository: CompanyRepository,
 ) -> WalletServiceProtocol:
     return WalletServiceImpl(wallet_repository, user_repository, company_repository)
 

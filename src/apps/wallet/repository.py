@@ -38,7 +38,7 @@ class WalletRepositoryImpl(
 
     async def first(self, id: BASE_ID) -> WalletReadSchema:
         async with self.session as s:
-            statement = sa.select(self.model_type).where(self.model_type.user_id == id)
+            statement = sa.select(self.model_type).where(self.model_type.holder_id == id)
             model = (await s.execute(statement)).scalars().first()
             return self.read_schema_type.model_validate(model, from_attributes=True)
 
