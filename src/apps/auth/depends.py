@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Annotated
 
@@ -13,12 +14,12 @@ from src.settings import settings
 
 
 async def get_current_user(
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())],
-        user_repository: UserRepository,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())],
+    user_repository: UserRepository,
 ) -> UserReadSchema:
     try:
         token = jwt.decode(credentials.credentials, key=settings.secret, algorithms=[settings.algorithm])
-    except JWTError as exc:
+    except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
     return await user_repository.get(token['sub'])
 

@@ -22,7 +22,6 @@ class TransactionUpdateSchema(BaseModel):
 
 
 class TransferRequestSchema(BaseModel):
-    from_wallet_id: UUID
     to_wallet_id: UUID
     amount: float
 
