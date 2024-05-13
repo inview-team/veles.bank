@@ -1,15 +1,18 @@
-FROM python:3.11-alpine
-
-ENV PYTHONPATH "${PYTHONPATH}:/app/src"
-
-RUN pip3 install poetry
+FROM python:3.11
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock .
+RUN pip3 install --upgrade pip
+
+RUN pip3 install poetry
+
+COPY pyproject.toml .
+COPY poetry.lock .
 
 RUN poetry config virtualenvs.create false && poetry install --no-dev
 
 COPY . .
 
-CMD ["python", "src/main.py"]
+WORKDIR /app/src
+
+CMD fastapi run src.main:app --port 30004
