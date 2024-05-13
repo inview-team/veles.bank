@@ -1,18 +1,19 @@
 FROM python:3.11
 
+ENV PYTHONPATH "${PYTHONPATH}:/app/src"
+
 WORKDIR /app
 
 RUN pip3 install --upgrade pip
 
 RUN pip3 install poetry
 
-COPY pyproject.toml .
-COPY poetry.lock .
+RUN pip3 install alembic
+
+COPY pyproject.toml poetry.lock .
 
 RUN poetry config virtualenvs.create false && poetry install --no-dev
 
 COPY . .
 
-WORKDIR /app/src
-
-CMD fastapi run src.main:app --port 30004
+CMD ["python", "src/main.py"]
